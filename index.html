@@ -84,22 +84,22 @@ const downloadLink = document.getElementById("download-link");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const client = document.getElementById("client").value.trim();
-  const start_date = document.getElementById("start-date").value;
-  const end_date = document.getElementById("end-date").value;
-
-  if (!client || !start_date || !end_date) return;
+  const startRaw = new Date(document.getElementById("start-date").value);
+  const endRaw = new Date(document.getElementById("end-date").value);
+  const start_date = startRaw.toISOString().split('T')[0];
+  const end_date = endRaw.toISOString().split('T')[0];
 
   logSection.innerHTML = '';
   logSection.classList.remove("hidden");
   downloadSection.classList.add("hidden");
 
-  await fetch("http://172.31.19.74:7860/start-job", {
+  await fetch("https://172.31.19.74:7860/start-job", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ start_date, end_date, client })
   });
 
-  const eventSource = new EventSource("http://172.31.19.74:7860/logs");
+  const eventSource = new EventSource("https://172.31.19.74:7860/logs");
   eventSource.onmessage = function(event) {
     logSection.innerHTML += event.data + "\n";
     logSection.scrollTop = logSection.scrollHeight;
@@ -112,7 +112,7 @@ form.addEventListener("submit", async (e) => {
     eventSource.close();
   };
 
-  downloadLink.href = "http://172.31.19.74:7860/download-report";
+  downloadLink.href = "https://172.31.19.74:7860/download-report";
 });
 </script>
 </body>

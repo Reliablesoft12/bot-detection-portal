@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,253 +6,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bot Detection Report</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .font-mono {
-      font-family: 'Roboto Mono', monospace;
-    }
-    .blinking-cursor {
-      display: inline-block;
-      width: 10px;
-      height: 1.2rem;
-      background-color: #9ca3af;
-      animation: blink 1s step-end infinite;
-      margin-left: 4px;
-    }
-    @keyframes blink {
-      from, to { background-color: transparent }
-      50% { background-color: #9ca3af; }
-    }
-  </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center min-h-screen transition-colors duration-500">
-
-<div id="app-container" class="w-full max-w-4xl mx-auto p-4">
-
-  <!-- Login Screen -->
-  <div id="login-screen" class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 md:p-12">
-    <div class="text-center mb-8">
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Bot Detection Portal</h1>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Sign in to generate a report</p>
-    </div>
-    <form id="login-form" class="space-y-6">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center min-h-screen">
+<div id="app" class="w-full max-w-2xl mx-auto p-4">
+  <div id="form-section" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl">
+    <h1 class="text-2xl font-bold mb-4">Bot Detection Portal</h1>
+    <form id="start-form" class="space-y-4">
       <div>
-        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
-        <input type="text" id="username" name="username" class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        <label class="block">Client Name</label>
+        <input type="text" id="client" class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white" required>
       </div>
       <div>
-        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-        <input type="password" id="password" name="password" class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        <label class="block">Start Date (YYYY-MM-DD)</label>
+        <input type="date" id="start-date" class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white" required>
       </div>
-      <div id="login-error" class="text-red-500 text-sm hidden">Invalid username or password. Please try again.</div>
-      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-transform transform hover:scale-105">
-        Sign In
-      </button>
+      <div>
+        <label class="block">End Date (YYYY-MM-DD)</label>
+        <input type="date" id="end-date" class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white" required>
+      </div>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Start Analysis</button>
     </form>
   </div>
 
-  <!-- Dashboard & Logs Screen -->
-  <div id="dashboard-screen" class="hidden bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 md:p-12">
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Generate Report</h1>
-      <button id="logout-button" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">Logout</button>
-    </div>
+  <div id="log-section" class="bg-black text-white p-4 mt-6 rounded-lg h-64 overflow-y-scroll hidden font-mono text-sm"></div>
 
-    <!-- Submission Form -->
-    <div id="submission-form-container">
-      <p class="text-gray-600 dark:text-gray-400 mb-6">Select a client and date to begin the bot detection analysis.</p>
-      <form id="submission-form" class="space-y-6">
-        <div>
-          <label for="client-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Client Name</label>
-          <select id="client-name" name="client-name" required class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-            <option>Client A - Social Media</option>
-            <option>Client B - E-commerce</option>
-            <option>Client C - Financial Services</option>
-            <option>Client D - Gaming Platform</option>
-          </select>
-        </div>
-
-        <!-- Year & Month Selectors -->
-        <div class="flex gap-4">
-          <div class="w-1/2">
-            <label for="report-year" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Year</label>
-            <select id="report-year" required class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm">
-              <!-- JS will populate -->
-            </select>
-          </div>
-          <div class="w-1/2">
-            <label for="report-month" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Month</label>
-            <select id="report-month" required class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm">
-              <option value="01">January</option>
-              <option value="02">February</option>
-              <option value="03">March</option>
-              <option value="04">April</option>
-              <option value="05">May</option>
-              <option value="06">June</option>
-              <option value="07">July</option>
-              <option value="08">August</option>
-              <option value="09">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
-            </select>
-          </div>
-        </div>
-
-        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-transform transform hover:scale-105">
-          Start Analysis
-        </button>
-      </form>
-    </div>
-
-    <!-- Logs Section -->
-    <div id="logs-container" class="hidden mt-8">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Live Analysis Logs</h2>
-      <div id="logs" class="w-full h-80 bg-gray-900 dark:bg-black rounded-lg p-4 font-mono text-sm text-white overflow-y-auto shadow-inner"></div>
-      <div id="process-status" class="mt-4 text-center"></div>
-    </div>
+  <div id="download-section" class="text-center mt-4 hidden">
+    <a id="download-link" href="#" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Download Report</a>
   </div>
 </div>
 
 <script>
-  const loginScreen = document.getElementById('login-screen');
-  const dashboardScreen = document.getElementById('dashboard-screen');
-  const loginForm = document.getElementById('login-form');
-  const loginError = document.getElementById('login-error');
-  const logoutButton = document.getElementById('logout-button');
-  const submissionForm = document.getElementById('submission-form');
-  const logsContainer = document.getElementById('logs-container');
-  const logsDiv = document.getElementById('logs');
-  const processStatusDiv = document.getElementById('process-status');
+const form = document.getElementById("start-form");
+const logSection = document.getElementById("log-section");
+const downloadSection = document.getElementById("download-section");
+const downloadLink = document.getElementById("download-link");
 
-  // Populate Year Select
-  const yearSelect = document.getElementById('report-year');
-  for (let y = 2021; y <= 2040; y++) {
-    const option = document.createElement('option');
-    option.value = y;
-    option.textContent = y;
-    yearSelect.appendChild(option);
-  }
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const client = document.getElementById("client").value;
+  const start_date = document.getElementById("start-date").value;
+  const end_date = document.getElementById("end-date").value;
 
-  // Set default year/month
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
-  yearSelect.value = year;
-  document.getElementById('report-month').value = month;
+  logSection.innerHTML = '';
+  logSection.classList.remove("hidden");
+  downloadSection.classList.add("hidden");
 
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const username = loginForm.username.value;
-    const password = loginForm.password.value;
-    if (username === 'admin' && password === 'SLI@654321') {
-      loginScreen.classList.add('hidden');
-      dashboardScreen.classList.remove('hidden');
-      loginError.classList.add('hidden');
-    } else {
-      loginError.classList.remove('hidden');
+  await fetch("http://172.31.19.74:7860/start-job", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ start_date, end_date, client })
+  });
+
+  const eventSource = new EventSource("http://172.31.19.74:7860/logs");
+  eventSource.onmessage = function(event) {
+    logSection.innerHTML += event.data + "\n";
+    logSection.scrollTop = logSection.scrollHeight;
+    if (event.data.includes("✅ Bot report saved:")) {
+      eventSource.close();
+      downloadSection.classList.remove("hidden");
     }
-  });
+  };
+  eventSource.onerror = function() {
+    eventSource.close();
+  };
 
-  logoutButton.addEventListener('click', () => {
-    dashboardScreen.classList.add('hidden');
-    loginScreen.classList.remove('hidden');
-    loginForm.reset();
-    yearSelect.value = year;
-    document.getElementById('report-month').value = month;
-    logsContainer.classList.add('hidden');
-    submissionForm.reset();
-  });
-
-  submissionForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const clientName = document.getElementById('client-name').value;
-    const yearVal = document.getElementById('report-year').value;
-    const monthVal = document.getElementById('report-month').value;
-    const date = `${yearVal}-${monthVal}`;
-    document.getElementById('submission-form-container').classList.add('hidden');
-    logsContainer.classList.remove('hidden');
-    logsDiv.innerHTML = '';
-    processStatusDiv.innerHTML = '';
-    simulateLogs(clientName, date);
-  });
-
-  function simulateLogs(clientName, date) {
-    const logMessages = [
-      { msg: 'Initializing bot detection sequence...', delay: 500 },
-      { msg: `Target: ${clientName} | Period: ${date}`, delay: 500 },
-      { msg: 'Connecting to AWS analysis instance (t3.large)...', delay: 1500 },
-      { msg: '<span class="text-green-400">SUCCESS:</span> Secure connection established.', delay: 1000 },
-      { msg: 'Executing script: `run_bot_analysis.sh`...', delay: 1000 },
-      { msg: 'Fetching traffic logs from S3 bucket...', delay: 2000 },
-      { msg: 'Found 1,745,921 log entries to analyze.', delay: 1000 },
-      { msg: 'Analyzing traffic patterns... (Behavioral Analysis)', delay: 3000 },
-      { msg: 'Analyzing user agent strings... (Signature Analysis)', delay: 2500 },
-      { msg: '<span class="text-yellow-400">FLAGGED:</span> 1,204 suspicious IP addresses.', delay: 1500 },
-      { msg: 'Cross-referencing with known botnets...', delay: 2000 },
-      { msg: 'Finalizing heuristics model...', delay: 1500 },
-      { msg: `<span class="text-green-400">SUCCESS:</span> Report \`bot-report-${clientName.split(" ")[0].toLowerCase()}-${date}.pdf\` generated.`, delay: 1000 },
-      { msg: 'Terminating AWS instance to save cost...', delay: 500 },
-      { msg: 'Analysis complete.', delay: 500 }
-    ];
-    let totalDelay = 0;
-    let currentCursor = null;
-    const addLogLine = (text) => {
-      if (currentCursor) currentCursor.remove();
-      const line = document.createElement('p');
-      line.innerHTML = `> ${text}`;
-      logsDiv.appendChild(line);
-      currentCursor = document.createElement('span');
-      currentCursor.className = 'blinking-cursor';
-      logsDiv.appendChild(currentCursor);
-      logsDiv.scrollTop = logsDiv.scrollHeight;
-    };
-    addLogLine('');
-    logMessages.forEach(log => {
-      totalDelay += log.delay;
-      setTimeout(() => addLogLine(log.msg), totalDelay);
-    });
-    setTimeout(() => {
-      if (currentCursor) currentCursor.remove();
-      const statusText = document.createElement('p');
-      statusText.className = 'text-green-500 font-semibold text-lg';
-      statusText.textContent = '✅ Analysis Finished!';
-      processStatusDiv.appendChild(statusText);
-      const downloadButton = document.createElement('button');
-      downloadButton.textContent = 'Download Report';
-      downloadButton.className = 'mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-transform transform hover:scale-105';
-      downloadButton.onclick = () => {
-        const fileContent = `Bot Detection Report\n--------------------\nClient: ${clientName}\nPeriod: ${date}\n\nAnalysis completed on: ${new Date().toUTCString()}\n\nSummary:\n- 1,745,921 log entries analyzed.\n- 1,204 suspicious IPs flagged.\n- 87 confirmed bot IPs blocked.`;
-        const blob = new Blob([fileContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `bot-report-${clientName.split(" ")[0].toLowerCase()}-${date}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      };
-      processStatusDiv.appendChild(downloadButton);
-      const newJobButton = document.createElement('button');
-      newJobButton.textContent = 'Run New Analysis';
-      newJobButton.className = 'ml-4 mt-4 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-transform transform hover:scale-105';
-      newJobButton.onclick = () => {
-        logsContainer.classList.add('hidden');
-        document.getElementById('submission-form-container').classList.remove('hidden');
-        submissionForm.reset();
-        yearSelect.value = year;
-        document.getElementById('report-month').value = month;
-      };
-      processStatusDiv.appendChild(newJobButton);
-    }, totalDelay + 500);
-  }
+  downloadLink.href = "http://172.31.19.74:7860/download-report";
+});
 </script>
-
 </body>
 </html>

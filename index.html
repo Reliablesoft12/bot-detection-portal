@@ -12,8 +12,8 @@
   <div id="login-screen" class="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-6">
     <h1 class="text-2xl font-bold text-center mb-4">Bot Detection Portal</h1>
     <form id="login-form" class="space-y-4">
-      <div><label class="block">Username</label><input type="text" id="username" required class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white"></div>
-      <div><label class="block">Password</label><input type="password" id="password" required class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white"></div>
+      <div><label>Username</label><input type="text" id="username" required class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white"></div>
+      <div><label>Password</label><input type="password" id="password" required class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white"></div>
       <div id="login-error" class="text-red-500 text-sm hidden">Invalid username or password.</div>
       <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Login</button>
     </form>
@@ -23,9 +23,9 @@
     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl mt-4">
       <h2 class="text-xl font-bold mb-4">Run Bot Detection</h2>
       <form id="start-form" class="space-y-4">
-        <div><label class="block">Client Name</label><input type="text" id="client" required class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white"></div>
-        <div><label class="block">Start Date (YYYY-MM-DD)</label><input type="date" id="start-date" required class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white"></div>
-        <div><label class="block">End Date (YYYY-MM-DD)</label><input type="date" id="end-date" required class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white"></div>
+        <div><label>Client Name</label><input type="text" id="client" required class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white"></div>
+        <div><label>Start Date (YYYY-MM-DD)</label><input type="date" id="start-date" required class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white"></div>
+        <div><label>End Date (YYYY-MM-DD)</label><input type="date" id="end-date" required class="w-full p-2 rounded border dark:bg-gray-700 dark:text-white"></div>
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Start Analysis</button>
       </form>
     </div>
@@ -38,6 +38,8 @@
 </div>
 
 <script>
+const backend = "https://count-recognised-training-johns.trycloudflare.com";
+
 const loginForm = document.getElementById("login-form");
 const loginError = document.getElementById("login-error");
 const loginScreen = document.getElementById("login-screen");
@@ -73,13 +75,13 @@ form.addEventListener("submit", async (e) => {
   logSection.classList.remove("hidden");
   downloadSection.classList.add("hidden");
 
-  await fetch("https://count-recognised-training-johns.trycloudflare.com/start-job", {
+  await fetch(backend + "/start-job", {
     method: "POST",
-    headers: {{ "Content-Type": "application/json" }},
-    body: JSON.stringify({{ start_date, end_date, client }})
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ start_date, end_date, client })
   });
 
-  const eventSource = new EventSource("https://count-recognised-training-johns.trycloudflare.com/logs");
+  const eventSource = new EventSource(backend + "/logs");
   eventSource.onmessage = function(event) {
     logSection.innerHTML += event.data + "\n";
     logSection.scrollTop = logSection.scrollHeight;
@@ -92,7 +94,7 @@ form.addEventListener("submit", async (e) => {
     eventSource.close();
   };
 
-  downloadLink.href = "https://count-recognised-training-johns.trycloudflare.com/download-report";
+  downloadLink.href = backend + "/download-report";
 });
 </script>
 </body>
